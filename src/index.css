@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply dark:bg-neutral-900 text-neutral-200;
+  }
+}
+
+@layer utilities {
+  .v-stack {
+    @apply flex flex-col gap-y-6 items-center;
+  }
+  .h-stack {
+    @apply flex flex-row gap-x-6 items-center;
+  }
+  .stack {
+    @apply flex flex-col gap-x-6 gap-y-6 items-start;
+  }
+}
