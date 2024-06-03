@@ -6,8 +6,9 @@ import { Input } from "./components/ui/input";
 import { Button } from "./components/ui/button";
 import { Checkbox } from "./components/ui/checkbox";
 import { Label } from "./components/ui/label";
-import { Github } from "lucide-react";
+import { Code, Github } from "lucide-react";
 import { prettyPrintJson } from "pretty-print-json";
+import { TooltipComposed } from "./components/composed/tooltip.composed";
 
 function App() {
   const [arrayFilter] = useState<string[]>([
@@ -41,12 +42,27 @@ function App() {
     <div className="min-h-screen v-stack my-40">
       <h1 className="text-5xl font-bold">React Filters</h1>
       <div className="h-stack">
-        <a href="https://github.com/denyncrawford/react-filter" target="_blank">
-          <Github size={20} />
-        </a>
-        <a href="https://jsr.io/@denyncrawford/react-filters" target="_blank">
-          <img src="https://jsr.io/badges/@denyncrawford/react-filters" />
-        </a>
+        <TooltipComposed message="Github repo">
+          <a
+            href="https://github.com/denyncrawford/react-filter"
+            target="_blank"
+          >
+            <Github size={20} />
+          </a>
+        </TooltipComposed>
+        <TooltipComposed message="Demo code">
+          <a
+            href="https://github.com/denyncrawford/react-filter-demo"
+            target="_blank"
+          >
+            <Code size={20} />
+          </a>
+        </TooltipComposed>
+        <TooltipComposed message="JSR package">
+          <a href="https://jsr.io/@denyncrawford/react-filters" target="_blank">
+            <img src="https://jsr.io/badges/@denyncrawford/react-filters" />
+          </a>
+        </TooltipComposed>
       </div>
       <h2 className="text-xs text-neutral-500">
         By{" "}
@@ -78,6 +94,7 @@ function App() {
               control={control}
               render={({ onChange, value }) => (
                 <Checkbox
+                  id="terms"
                   value={value}
                   onCheckedChange={(value) => {
                     onChange(!!value);
@@ -85,7 +102,7 @@ function App() {
                 />
               )}
             />
-            <Label className=" whitespace-nowrap">Accept terms</Label>
+            <Label htmlFor="terms" className="whitespace-nowrap">Accept terms</Label>
           </div>
         </div>
         <div className="h-stack">
@@ -114,19 +131,21 @@ function App() {
       </div>
       <div className="h-stack !gap-6 !gap-y-4 flex-wrap max-w-[700px] justify-center">
         <h1>Applyed filters:</h1>
-        <div
-          className="h-stack !gap-2 max-w-[700px] flex-wrap justify-center"
-        >
+        <div className="h-stack !gap-2 max-w-[700px] flex-wrap justify-center">
           {serializedValues.map((f) => (
             <div
               key={f.key}
               className="h-stack !gap-1 rounded-lg bg-neutral-950 px-4 py-2 text-xs whitespace-nowrap"
             >
               <span className="font-bold">{f.label}</span>:{" "}
-              <span className="text-neutral-500 whitespace-break-spaces">{f.value as string}</span>
+              <span className="text-neutral-500 whitespace-break-spaces">
+                {f.value as string}
+              </span>
             </div>
           ))}
-          { serializedValues.length === 0 && <div className="text-neutral-500">No filters applied</div> }
+          {serializedValues.length === 0 && (
+            <div className="text-neutral-500">No filters applied</div>
+          )}
         </div>
       </div>
       <div style={{ display: "flex", gap: "30px" }}>
