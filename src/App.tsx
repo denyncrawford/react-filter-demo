@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useEffect, useState } from "react";
 import "./App.css";
 import { useFilter } from "@denyncrawford/react-filters";
@@ -9,14 +10,29 @@ import { Label } from "./components/ui/label";
 import { Code, Github } from "lucide-react";
 import { prettyPrintJson } from "pretty-print-json";
 import { TooltipComposed } from "./components/composed/tooltip.composed";
+import { cn } from "./lib/utils";
 
 function App() {
-  const [arrayFilter] = useState<string[]>([
-    "Yearly Subscription",
-    "Monthly Subscription",
-    "Purchase",
+  const [arrayFilter, setArrayFilter] = useState<
+    {
+      name: string;
+      added: boolean;
+    }[]
+  >([
+    {
+      name: "Monthly Subscription",
+      added: false,
+    },
+    {
+      name: "Yearly Subscription",
+      added: false,
+    },
+    {
+      name: "Purchase",
+      added: false,
+    },
   ]);
-  const [destValues, setDestValues] = useState<string[]>([]);
+  const [_destValues, setDestValues] = useState<string[]>([]);
   const {
     register,
     deSerializedValues,
@@ -27,11 +43,10 @@ function App() {
   } = useFilter({});
 
   useEffect(() => {
-    //   window.location.search = searchString
-    // don't sert search but replace without navigating
     window.location.hash = `#${searchString}`;
   }, [searchString]);
 
+  // Simulates a multi-select filter input
   const registerArrayFilter = register({
     name: "paymentType",
     displayName: "Payment Type",
@@ -102,7 +117,9 @@ function App() {
                 />
               )}
             />
-            <Label htmlFor="terms" className="whitespace-nowrap">Accept terms</Label>
+            <Label htmlFor="terms" className="whitespace-nowrap">
+              Accept terms
+            </Label>
           </div>
         </div>
         <div className="h-stack">
@@ -110,21 +127,54 @@ function App() {
           {arrayFilter.map((f) => (
             <Button
               size={"sm"}
-              className="dark:bg-neutral-800 dark:text-white"
-              key={f}
+              className={cn("dark:bg-neutral-800 dark:text-white", {
+                "dark:bg-neutral-800 !text-neutral-600": f.added,
+              })}
+              key={f.name}
               onClick={() => {
-                setDestValues((curr) => {
-                  registerArrayFilter.onChange?.({
-                    target: {
-                      // @ts-expect-error - this is a bug in react-filters
-                      value: [...destValues, f],
-                    },
+                // this should be a component that already auto updates it's own state
+                // but this is a demonstration of how to do it manually
+                // the idea is only to execute the onChange function of the filter
+                setArrayFilter((curr) => {
+                  return curr.map((f2) => {
+                    if (f.name === f2.name && !f2.added) {
+                      setDestValues((curr2) => {
+                        registerArrayFilter.onChange?.({
+                          target: {
+                            // @ts-expect-error - this is a bug in react-filters
+                            value: [...curr2, f.name],
+                          },
+                        });
+                        return [...curr2, f.name];
+                      });
+                      return {
+                        ...f2,
+                        added: true,
+                      };
+                    } else if (f.name === f2.name && f2.added) {
+                      setDestValues((curr2) => {
+                        registerArrayFilter.onChange?.({
+                          target: {
+                            // @ts-expect-error - this is a bug in react-filters
+                            value:
+                              curr2.length === 1
+                                ? undefined
+                                : curr2.filter((v) => v !== f.name),
+                          },
+                        });
+                        return curr2.filter((v) => v !== f.name);
+                      });
+                      return {
+                        ...f2,
+                        added: false,
+                      };
+                    }
+                    return f2;
                   });
-                  return [...curr, f];
                 });
               }}
             >
-              {f}
+              {f.name}
             </Button>
           ))}
         </div>
